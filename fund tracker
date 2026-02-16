@@ -1,0 +1,373 @@
+Excellent choice 🔥
+This is a serious winning-level problem if you execute it properly.
+
+I’ll give you everything from scratch:
+
+✅ Problem Background
+
+🎯 Clear SIH-Style Problem Statement
+
+💡 Proposed Solution
+
+🧱 System Architecture
+
+🗄 Database Schema
+
+🌐 Features Breakdown
+
+👥 4-Person Team Plan (12 Hours)
+
+🎤 How to Present to Judges
+
+🏆 What Makes It Win
+
+💰 Project Title
+Public Expenditure Transparency & Monitoring System (PETMS)
+🏛 1️⃣ Problem Background
+
+In India, large amounts of government funds are allocated every year for:
+
+Roads
+
+Schools
+
+Hospitals
+
+Smart city projects
+
+Rural infrastructure
+
+However:
+
+Citizens cannot track how funds are being used.
+
+There is limited transparency in spending.
+
+Delays and cost overruns go unnoticed.
+
+No centralized public dashboard exists.
+
+Corruption risks increase due to lack of visibility.
+
+🎯 2️⃣ SIH-Style Problem Statement
+
+Design and develop a web-based platform that ensures transparency in public expenditure by enabling citizens to monitor government project allocations, track spending, identify delays, and flag suspicious budget discrepancies in real-time.
+
+The system should:
+
+Display project-wise fund allocation and usage
+
+Show timeline tracking
+
+Provide automated red-flag alerts
+
+Allow citizens to raise complaints
+
+Offer analytics dashboards for administrators
+
+💡 3️⃣ Proposed Solution
+
+We propose a centralized web portal where:
+
+Government officials upload project details
+
+Contractors update progress
+
+Citizens view live dashboards
+
+System auto-detects suspicious patterns
+
+Data is visualized through charts and maps
+
+🧱 4️⃣ System Architecture (Simple & Effective)
+
+Frontend:
+
+React + Tailwind
+
+Chart.js
+
+Leaflet Maps
+
+Backend:
+
+Node.js
+
+Express
+
+MongoDB Atlas
+
+Deployment:
+
+Frontend → Vercel
+
+Backend → Render
+
+Architecture Flow:
+
+User → React Frontend → Express API → MongoDB
+System Logic → Red Flag Detection Engine
+
+🗄 5️⃣ Database Schema (Important)
+Users Collection
+
+_id
+
+name
+
+email
+
+password
+
+role (admin / contractor / citizen)
+
+Projects Collection
+
+_id
+
+title
+
+department
+
+location
+
+totalBudget
+
+amountSpent
+
+completionPercentage
+
+startDate
+
+expectedEndDate
+
+status (On Time / Delayed)
+
+riskFlag (true/false)
+
+Complaints Collection
+
+_id
+
+projectId
+
+citizenId
+
+description
+
+imageURL
+
+status (Pending / Resolved)
+
+🌐 6️⃣ Feature Breakdown
+🔐 1. Role-Based Authentication
+
+Admin:
+
+Add projects
+
+View analytics
+
+Update budget
+
+Contractor:
+
+Update progress
+
+Upload reports
+
+Citizen:
+
+View projects
+
+Raise complaints
+
+📊 2. Dashboard
+
+Show:
+
+Total funds allocated
+
+Total funds used
+
+Number of delayed projects
+
+Number of risky projects
+
+Use:
+Chart.js for:
+
+Pie chart (Budget usage)
+
+Bar chart (Department spending)
+
+Line chart (Monthly trends)
+
+🚨 3. Red Flag Detection (Winning Feature)
+
+Add automatic risk detection logic:
+
+IF:
+
+amountSpent > 90% AND completion < 50%
+
+project delayed > 30 days
+
+sudden budget increase > 20%
+
+THEN:
+riskFlag = true
+
+Display:
+⚠️ High Risk Badge on dashboard
+
+This looks like AI but is rule-based (easy to build).
+
+📍 4. Map View
+
+Use Leaflet:
+
+Show project locations
+
+Green marker = healthy
+
+Red marker = risk
+
+Yellow marker = delayed
+
+Judges LOVE visual maps.
+
+📝 5. Complaint System
+
+Citizen:
+
+Select project
+
+Upload description + image
+
+Track status
+
+Admin:
+
+View complaints
+
+Mark resolved
+
+👥 7️⃣ 12-Hour Execution Plan (Very Important)
+Hour 0–1
+
+Setup GitHub repo
+
+Setup MongoDB
+
+Create project structure
+
+Person 1 – Frontend (Dashboard + UI)
+
+Hour 1–6:
+
+Login page
+
+Dashboard UI
+
+Charts
+
+Hour 6–10:
+
+Map view
+
+Styling
+
+Person 2 – Backend
+
+Hour 1–6:
+
+Auth routes
+
+Project CRUD APIs
+
+Hour 6–9:
+
+Red flag logic
+
+Complaint APIs
+
+Person 3 – Integration
+
+Hour 4–10:
+
+Connect frontend to backend
+
+Fix bugs
+
+Test
+
+Person 4 – Presentation & Polish
+
+Hour 6–12:
+
+Add dummy realistic data
+
+Improve UI
+
+Prepare PPT
+
+Deploy project
+
+🎤 8️⃣ How To Present (This Wins Hackathons)
+
+Start with:
+
+"India allocates lakhs of crores annually to public projects, but citizens lack visibility into how funds are utilized. Our system ensures transparency, accountability, and corruption risk detection."
+
+Then demo:
+
+Dashboard overview
+
+Risk flagged project
+
+Map visualization
+
+Complaint submission
+
+Admin analytics
+
+Keep demo under 4 minutes.
+
+🏆 9️⃣ Why This Can Win
+
+✔ Strong social impact
+✔ Government relevance
+✔ Transparency focus
+✔ Data visualization heavy
+✔ Looks like production-ready system
+✔ Not just CRUD — has intelligence
+
+💎 Extra Boost (If Time Left)
+
+Add:
+
+Download report as PDF
+
+Dark mode toggle
+
+Export data as CSV
+
+Simple predictive graph (fake but realistic demo)
+
+🚀 Final Advice
+
+In hackathons:
+
+Judges don’t reward complexity.
+They reward:
+
+Problem clarity
+
+Clean UI
+
+Real-world impact
+
+Strong explanation
+
+Your project checks all 4.
