@@ -45,8 +45,8 @@ const ContractorDashboard = () => {
 
     if (authLoading || loading) {
         return (
-            <div className="min-vh-100 d-flex align-items-center justify-content-center" style={{ backgroundColor: '#FFFBEB' }}>
-                <div className="spinner-border" style={{ color: '#F59E0B' }} role="status"><span className="visually-hidden">Loading...</span></div>
+            <div className="min-vh-100 d-flex align-items-center justify-content-center" style={{ backgroundColor: '#FEE2E2' }}>
+                <div className="spinner-border" style={{ color: '#EF4444' }} role="status"><span className="visually-hidden">Loading...</span></div>
             </div>
         );
     }
@@ -57,25 +57,25 @@ const ContractorDashboard = () => {
     return (
         <>
             <SEO pageTitle="Contractor Dashboard - PETMS" />
-            <div className="d-flex" style={{ backgroundColor: '#FFFBEB', minHeight: '100vh' }}>
+            <div className="d-flex" style={{ backgroundColor: '#FEF2F2', minHeight: '100vh' }}>
                 <ContractorSidebar />
                 <main className="flex-grow-1" style={{ marginLeft: 260, padding: '24px 32px' }}>
                     <div className="d-flex justify-content-between align-items-center mb-4">
                         <div>
-                            <h4 className="fw-bold mb-1 d-flex align-items-center gap-2" style={{ color: '#92400E' }}>
-                                <IconHardHat size={22} color="#F59E0B" /> Contractor Dashboard
+                            <h4 className="fw-bold mb-1 d-flex align-items-center gap-2" style={{ color: '#991B1B' }}>
+                                <IconHardHat size={22} color="#EF4444" /> Contractor Dashboard
                             </h4>
                             <p className="text-muted mb-0" style={{ fontSize: 14 }}>Manage your projects and update progress</p>
                         </div>
-                        <div className="d-flex align-items-center gap-2 px-3 py-2 rounded" style={{ backgroundColor: '#FEF3C7', fontSize: 13 }}>
-                            <div className="rounded-circle" style={{ width: 8, height: 8, backgroundColor: '#F59E0B' }}></div>
-                            <span className="fw-medium" style={{ color: '#B45309' }}>{user?.name || 'Contractor'}</span>
+                        <div className="d-flex align-items-center gap-2 px-3 py-2 rounded" style={{ backgroundColor: '#FEE2E2', fontSize: 13 }}>
+                            <div className="rounded-circle" style={{ width: 8, height: 8, backgroundColor: '#EF4444' }}></div>
+                            <span className="fw-medium" style={{ color: '#B91C1C' }}>{user?.name || 'Contractor'}</span>
                         </div>
                     </div>
 
                     <div className="row g-4 mb-4">
                         <div className="col-md-3">
-                            <StatsCard icon={<IconClipboard size={20} color="#F59E0B" />} label="My Projects" value={stats?.totalProjects || displayProjects.length} subtext="Assigned" color="orange" />
+                            <StatsCard icon={<IconClipboard size={20} color="#EF4444" />} label="My Projects" value={stats?.totalProjects || displayProjects.length} subtext="Assigned" color="red" />
                         </div>
                         <div className="col-md-3">
                             <StatsCard icon={<IconWallet size={20} color="#3B82F6" />} label="Budget Assigned" value={formatCurrency(stats?.totalBudgetAssigned || 0)} subtext={`${stats?.totalProjects || 0} projects`} color="blue" />
@@ -84,11 +84,11 @@ const ContractorDashboard = () => {
                             <StatsCard icon={<IconBarChart size={20} color="#10B981" />} label="Avg Completion" value={`${stats?.averageCompletion || 0}%`} subtext="Across projects" color="green" progress={parseFloat(stats?.averageCompletion || 0)} />
                         </div>
                         <div className="col-md-3">
-                            <StatsCard icon={<IconClock size={20} color="#EF4444" />} label="Delayed" value={stats?.delayedProjects || 0} subtext="Need attention" color="red" />
+                            <StatsCard icon={<IconClock size={20} color="#F59E0B" />} label="Delayed" value={stats?.delayedProjects || 0} subtext="Need attention" color="orange" />
                         </div>
                     </div>
 
-                    <h6 className="fw-bold mb-3 d-flex align-items-center gap-2"><IconClipboard size={16} color="#92400E" /> My Projects</h6>
+                    <h6 className="fw-bold mb-3 d-flex align-items-center gap-2"><IconClipboard size={16} color="#991B1B" /> My Projects</h6>
                     <div className="row g-4 mb-4">
                         {displayProjects.map((project) => (
                             <div key={project._id || project.id} className="col-md-6 col-lg-4">
@@ -112,7 +112,7 @@ const ContractorDashboard = () => {
 
                     <div className="card border-0 shadow-sm" style={{ borderRadius: 12 }}>
                         <div className="card-header bg-white py-3 px-4" style={{ borderBottom: '1px solid #E5E7EB' }}>
-                            <h6 className="mb-0 fw-bold d-flex align-items-center gap-2"><IconCreditCard size={16} color="#F59E0B" /> Payment Tranches</h6>
+                            <h6 className="mb-0 fw-bold d-flex align-items-center gap-2"><IconCreditCard size={16} color="#EF4444" /> Payment Tranches</h6>
                         </div>
                         <div className="table-responsive">
                             <table className="table table-hover mb-0" style={{ fontSize: 13 }}>

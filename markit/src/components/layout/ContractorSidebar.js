@@ -13,8 +13,8 @@ const ContractorSidebar = () => {
 
     return (
         <div className="petms-sidebar bg-white shadow-sm" style={{ width: 260, minHeight: '100vh', position: 'fixed', top: 0, left: 0, zIndex: 100, borderRight: '1px solid #e5e7eb' }}>
-            <div className="p-4 text-center" style={{ borderBottom: '3px solid #F59E0B' }}>
-                <h4 className="mb-0 fw-bold" style={{ color: '#F59E0B' }}>PETMS</h4>
+            <div className="p-4 text-center" style={{ borderBottom: '3px solid #EF4444' }}>
+                <h4 className="mb-0 fw-bold" style={{ color: '#EF4444' }}>PETMS</h4>
                 <small className="text-muted">Contractor Portal</small>
             </div>
             <nav className="mt-3">
@@ -24,9 +24,9 @@ const ContractorSidebar = () => {
                             className={`d-flex align-items-center px-4 py-3 text-decoration-none ${router.pathname === item.path ? 'fw-semibold' : 'text-dark'}`}
                             style={{
                                 transition: 'all 0.2s',
-                                borderLeft: router.pathname === item.path ? '4px solid #F59E0B' : '4px solid transparent',
-                                backgroundColor: router.pathname === item.path ? '#FEF3C7' : 'transparent',
-                                color: router.pathname === item.path ? '#D97706' : undefined,
+                                borderLeft: router.pathname === item.path ? '4px solid #EF4444' : '4px solid transparent',
+                                backgroundColor: router.pathname === item.path ? '#FEE2E2' : 'transparent',
+                                color: router.pathname === item.path ? '#B91C1C' : undefined,
                             }}
                         >
                             <span className="me-3 d-flex">{item.icon}</span>
