@@ -103,7 +103,7 @@ const ContractorDashboard = () => {
 
                     <div className="row g-4 mb-4">
                         <div className="col-lg-6">
-                            <ProgressUpdateForm />
+                            <ProgressUpdateForm projects={displayProjects} />
                         </div>
                         <div className="col-lg-6">
                             <UpdatesTimeline />

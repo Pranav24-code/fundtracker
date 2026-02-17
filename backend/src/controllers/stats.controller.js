@@ -201,3 +201,32 @@ exports.getContractorStats = async (req, res) => {
     return errorResponse(res, 'Failed to get stats', 500);
   }
 };
+
+// @desc    Get risk breakdown
+// @route   GET /api/stats/risk-breakdown
+// @access  Private (Admin)
+exports.getRiskBreakdown = async (req, res) => {
+  try {
+    const riskProjects = await Project.find({ isActive: true, riskFlag: true });
+
+    const factorCounts = {};
+    riskProjects.forEach((p) => {
+      (p.riskFactors || []).forEach((factor) => {
+        factorCounts[factor] = (factorCounts[factor] || 0) + 1;
+      });
+    });
+
+    const breakdown = Object.entries(factorCounts).map(([factor, count]) => ({
+      factor,
+      count,
+    }));
+
+    return successResponse(res, 'Risk breakdown retrieved successfully', {
+      breakdown,
+      totalRiskFlagged: riskProjects.length,
+    });
+  } catch (error) {
+    console.error('Get risk breakdown error:', error);
+    return errorResponse(res, 'Failed to get risk breakdown', 500);
+  }
+};

@@ -1,24 +1,39 @@
 import React, { useState } from 'react';
-import projectData from '../../data/projectData';
+import { toast } from 'react-toastify';
+import { projectsAPI } from '../../utils/api';
 import { IconSend, IconCamera, IconUpload } from '../common/Icons';
 
-const ProgressUpdateForm = () => {
+const ProgressUpdateForm = ({ projects = [] }) => {
     const [selectedProject, setSelectedProject] = useState('');
     const [completion, setCompletion] = useState(0);
     const [amountSpent, setAmountSpent] = useState('');
     const [notes, setNotes] = useState('');
-    const [submitted, setSubmitted] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
 
-    const contractorProjects = projectData.filter((p, i) => i < 5);
-
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setSubmitted(true);
-        setTimeout(() => setSubmitted(false), 3000);
-        setSelectedProject('');
-        setCompletion(0);
-        setAmountSpent('');
-        setNotes('');
+        if (!selectedProject) {
+            toast.warning('Please select a project');
+            return;
+        }
+        setSubmitting(true);
+        try {
+            const res = await projectsAPI.update(selectedProject, {
+                completionPercentage: parseInt(completion),
+                amountSpent: amountSpent ? parseFloat(amountSpent) * 10000000 : undefined,
+                notes,
+            });
+            if (res.success) {
+                toast.success('Progress update submitted successfully!');
+                setSelectedProject('');
+                setCompletion(0);
+                setAmountSpent('');
+                setNotes('');
+            }
+        } catch (err) {
+            toast.error(err.message || 'Failed to submit update');
+        }
+        setSubmitting(false);
     };
 
     return (
@@ -26,19 +41,13 @@ const ProgressUpdateForm = () => {
             <div className="card-body p-4">
                 <h6 className="fw-bold mb-4 d-flex align-items-center gap-2"><IconSend size={16} color="#F59E0B" /> Update Project Progress</h6>
 
-                {submitted && (
-                    <div className="alert alert-success py-2" style={{ fontSize: 13, borderRadius: 8 }}>
-                        Progress update submitted successfully!
-                    </div>
-                )}
-
                 <form onSubmit={handleSubmit}>
                     <div className="mb-3">
                         <label className="form-label fw-medium" style={{ fontSize: 13 }}>Select Project</label>
                         <select className="form-select" value={selectedProject} onChange={(e) => setSelectedProject(e.target.value)} required style={{ borderRadius: 8 }}>
                             <option value="">-- Choose Project --</option>
-                            {contractorProjects.map((p) => (
-                                <option key={p.id} value={p.id}>{p.title}</option>
+                            {projects.map((p) => (
+                                <option key={p._id || p.id} value={p._id || p.id}>{p.title}</option>
                             ))}
                         </select>
                     </div>
@@ -74,7 +83,9 @@ const ProgressUpdateForm = () => {
 
                     <div className="d-flex gap-2">
                         <button type="button" className="btn btn-outline-secondary btn-sm" style={{ borderRadius: 8 }}>Cancel</button>
-                        <button type="submit" className="btn btn-sm text-white" style={{ backgroundColor: '#F59E0B', borderRadius: 8 }}>Submit Update</button>
+                        <button type="submit" className="btn btn-sm text-white" style={{ backgroundColor: '#F59E0B', borderRadius: 8 }} disabled={submitting}>
+                            {submitting ? 'Submitting...' : 'Submit Update'}
+                        </button>
                     </div>
                 </form>
             </div>

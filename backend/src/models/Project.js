@@ -165,8 +165,6 @@ projectSchema.virtual('spendingPercentage').get(function () {
   return ((this.amountSpent / this.totalBudget) * 100).toFixed(2);
 });
 
-// Index for geospatial queries
-projectSchema.index({ 'location.coordinates': '2dsphere' });
 // Index for common queries
 projectSchema.index({ department: 1, status: 1 });
 projectSchema.index({ isActive: 1 });

@@ -36,6 +36,14 @@ const userSchema = new mongoose.Schema(
       type: String,
       match: [/^[6-9]\d{9}$/, 'Please provide a valid Indian phone number'],
     },
+    organization: {
+      type: String,
+      trim: true,
+    },
+    district: {
+      type: String,
+      trim: true,
+    },
     avatar: {
       type: String,
       default: 'https://via.placeholder.com/150',
