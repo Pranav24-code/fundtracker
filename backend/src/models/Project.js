@@ -48,13 +48,11 @@ const projectSchema = new mongoose.Schema(
       coordinates: {
         latitude: {
           type: Number,
-          required: true,
           min: -90,
           max: 90,
         },
         longitude: {
           type: Number,
-          required: true,
           min: -180,
           max: 180,
         },
@@ -89,8 +87,13 @@ const projectSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['On Time', 'Delayed', 'Critical', 'Completed'],
-      default: 'On Time',
+      enum: ['Planned', 'Tender', 'In Progress', 'On Time', 'Delayed', 'Critical', 'Completed'],
+      default: 'Planned',
+    },
+    approvalStatus: {
+      type: String,
+      enum: ['Pending', 'Approved', 'Rejected'],
+      default: 'Pending',
     },
     riskFlag: {
       type: Boolean,
@@ -165,8 +168,6 @@ projectSchema.virtual('spendingPercentage').get(function () {
   return ((this.amountSpent / this.totalBudget) * 100).toFixed(2);
 });
 
-// Index for geospatial queries
-projectSchema.index({ 'location.coordinates': '2dsphere' });
 // Index for common queries
 projectSchema.index({ department: 1, status: 1 });
 projectSchema.index({ isActive: 1 });

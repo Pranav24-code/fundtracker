@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import SEO from '../../components/seo';
 import AdminSidebar from '../../components/layout/AdminSidebar';
+import ComplaintReviewModal from '../../components/admin/ComplaintReviewModal';
 import { useAuth } from '../../context/AuthContext';
 import { complaintsAPI } from '../../utils/api';
 import { IconAlertTriangle, IconHeart } from '../../components/common/Icons';
@@ -11,6 +12,7 @@ const AdminComplaints = () => {
     const { user, loading: authLoading } = useAuth();
     const [complaints, setComplaints] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [selectedComplaint, setSelectedComplaint] = useState(null);
 
     useEffect(() => {
         if (!authLoading && (!user || user.role !== 'admin')) {
@@ -117,7 +119,13 @@ const AdminComplaints = () => {
                                                 </td>
                                                 <td className="py-3 text-muted" style={{ fontSize: 12 }}>{formatDate(item.createdAt)}</td>
                                                 <td className="py-3">
-                                                    <button className="btn btn-sm btn-outline-primary" style={{ fontSize: 11, borderRadius: 6 }}>Review</button>
+                                                    <button
+                                                        className="btn btn-sm btn-outline-primary"
+                                                        style={{ fontSize: 11, borderRadius: 6 }}
+                                                        onClick={() => setSelectedComplaint(item)}
+                                                    >
+                                                        Review
+                                                    </button>
                                                 </td>
                                             </tr>
                                         );
@@ -130,6 +138,18 @@ const AdminComplaints = () => {
                         </div>
                     </div>
                 </main>
+
+                {/* Complaint Review Modal */}
+                {selectedComplaint && (
+                    <ComplaintReviewModal
+                        complaint={selectedComplaint}
+                        onClose={() => setSelectedComplaint(null)}
+                        onSuccess={() => {
+                            setSelectedComplaint(null);
+                            fetchComplaints();
+                        }}
+                    />
+                )}
             </div>
         </>
     );

@@ -49,6 +49,23 @@ export const AuthProvider = ({ children }) => {
         }
     }, []);
 
+    const register = useCallback(async (data) => {
+        try {
+            const response = await authAPI.register(data);
+            if (response.success) {
+                const { user: userData, token: authToken } = response.data;
+                setUser(userData);
+                setToken(authToken);
+                localStorage.setItem('petms_token', authToken);
+                localStorage.setItem('petms_user', JSON.stringify(userData));
+                return { success: true, user: userData };
+            }
+            return { success: false, message: response.message || 'Registration failed' };
+        } catch (error) {
+            return { success: false, message: error.message || 'Registration failed. Please try again.' };
+        }
+    }, []);
+
     const logout = useCallback(() => {
         setUser(null);
         setToken(null);
@@ -61,6 +78,7 @@ export const AuthProvider = ({ children }) => {
         token,
         loading,
         login,
+        register,
         logout,
         isAuthenticated: !!token,
         isAdmin: user?.role === 'admin',

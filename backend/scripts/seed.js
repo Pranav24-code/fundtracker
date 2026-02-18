@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const User = require('../src/models/User');
 const Project = require('../src/models/Project');
 const Complaint = require('../src/models/Complaint');
+const Update = require('../src/models/Update');
+const PaymentTranche = require('../src/models/PaymentTranche');
 
 const connectDB = async () => {
   await mongoose.connect(process.env.MONGODB_URI);
@@ -17,6 +19,8 @@ const seedData = async () => {
     await User.deleteMany();
     await Project.deleteMany();
     await Complaint.deleteMany();
+    await Update.deleteMany();
+    await PaymentTranche.deleteMany();
 
     console.log('🗑️  Existing data cleared');
 
@@ -31,28 +35,28 @@ const seedData = async () => {
       },
       {
         name: 'Rajesh Kumar (Contractor)',
-        email: 'contractor@example.com',
+        email: 'contractor1@petms.gov.in',
         password: 'Contractor@123',
         role: 'contractor',
         phone: '9876543211',
       },
       {
         name: 'Priya Sharma (Contractor)',
-        email: 'contractor2@example.com',
+        email: 'contractor2@petms.gov.in',
         password: 'Contractor@123',
         role: 'contractor',
         phone: '9876543213',
       },
       {
         name: 'Amit Citizen',
-        email: 'citizen@example.com',
+        email: 'citizen1@petms.gov.in',
         password: 'Citizen@123',
         role: 'citizen',
         phone: '9876543212',
       },
       {
         name: 'Sunita Verma',
-        email: 'citizen2@example.com',
+        email: 'citizen2@petms.gov.in',
         password: 'Citizen@123',
         role: 'citizen',
         phone: '9876543214',
@@ -451,11 +455,124 @@ const seedData = async () => {
     ]);
 
     console.log('✅ Complaints created');
+
+    // Create progress updates
+    await Update.create([
+      {
+        project: projects[0]._id,
+        contractor: contractor1,
+        progressPercentage: 70,
+        description: 'Completed lane widening for 120km stretch. Asphalt overlay done.',
+        workDone: 'Lane widening, asphalt overlay, drainage installation',
+        issuesFaced: 'Minor delay due to monsoon season',
+        nextMilestone: 'Complete remaining 30km stretch',
+        laborCount: 450,
+        materialsSummary: 'Asphalt 5000 tons, Steel 200 tons, Cement 1000 bags',
+        budgetUsedThisUpdate: 500000000,
+        gpsData: { lat: 19.076, lng: 72.8777 },
+        distanceFromSite: 120,
+        isValid: true,
+      },
+      {
+        project: projects[0]._id,
+        contractor: contractor1,
+        progressPercentage: 55,
+        description: 'Started Phase 2 lane widening. Earth cutting and leveling in progress.',
+        workDone: 'Earth cutting, base preparation',
+        laborCount: 380,
+        budgetUsedThisUpdate: 300000000,
+        gpsData: { lat: 19.08, lng: 72.88 },
+        distanceFromSite: 200,
+        isValid: true,
+      },
+      {
+        project: projects[2]._id,
+        contractor: contractor2,
+        progressPercentage: 55,
+        description: 'IoT sensors installed at 200 junctions. Smart bins deployed in CBD area.',
+        workDone: 'IoT sensor installation, smart bin deployment, central command center setup',
+        nextMilestone: 'Complete sensor network integration',
+        laborCount: 120,
+        budgetUsedThisUpdate: 200000000,
+      },
+      {
+        project: projects[5]._id,
+        contractor: contractor1,
+        progressPercentage: 60,
+        description: 'IT Park construction: 3 buildings structural work complete.',
+        workDone: 'Structural work for buildings A, B, C. Internal wiring started.',
+        issuesFaced: 'Steel price increase affecting budget',
+        laborCount: 600,
+        budgetUsedThisUpdate: 150000000,
+      },
+      {
+        project: projects[7]._id,
+        contractor: contractor1,
+        progressPercentage: 40,
+        description: 'Solar panel installation complete for Phase 1. Grid connectivity testing underway.',
+        workDone: '100MW panel installation, substation construction',
+        nextMilestone: 'Phase 2 panel installation (remaining 100MW)',
+        laborCount: 200,
+        budgetUsedThisUpdate: 800000000,
+      },
+    ]);
+
+    console.log('✅ Progress updates created');
+
+    // Create payment tranches
+    await PaymentTranche.create([
+      {
+        project: projects[0]._id,
+        trancheNumber: 1,
+        amount: 1500000000,
+        releaseDate: new Date('2024-02-01'),
+        conditions: 'Project initiation and 20% progress',
+        status: 'released',
+        releasedBy: users[0]._id,
+      },
+      {
+        project: projects[0]._id,
+        trancheNumber: 2,
+        amount: 1500000000,
+        releaseDate: new Date('2024-08-01'),
+        conditions: '50% progress completion',
+        status: 'released',
+        releasedBy: users[0]._id,
+      },
+      {
+        project: projects[0]._id,
+        trancheNumber: 3,
+        amount: 2000000000,
+        conditions: '80% progress and quality audit clearance',
+        status: 'pending',
+      },
+      {
+        project: projects[2]._id,
+        trancheNumber: 1,
+        amount: 1000000000,
+        releaseDate: new Date('2024-04-01'),
+        conditions: 'Project kickoff and procurement',
+        status: 'released',
+        releasedBy: users[0]._id,
+      },
+      {
+        project: projects[2]._id,
+        trancheNumber: 2,
+        amount: 1200000000,
+        conditions: '40% sensor deployment',
+        status: 'on_hold',
+        notes: 'Awaiting progress report review',
+      },
+    ]);
+
+    console.log('✅ Payment tranches created');
     console.log('\n🎉 Seed data inserted successfully!\n');
     console.log('📋 Login Credentials:');
-    console.log('   Admin:      admin@petms.gov.in / Admin@123');
-    console.log('   Contractor: contractor@example.com / Contractor@123');
-    console.log('   Citizen:    citizen@example.com / Citizen@123');
+    console.log('   Admin:       admin@petms.gov.in / Admin@123');
+    console.log('   Contractor1: contractor1@petms.gov.in / Contractor@123');
+    console.log('   Contractor2: contractor2@petms.gov.in / Contractor@123');
+    console.log('   Citizen1:    citizen1@petms.gov.in / Citizen@123');
+    console.log('   Citizen2:    citizen2@petms.gov.in / Citizen@123');
 
     process.exit(0);
   } catch (error) {

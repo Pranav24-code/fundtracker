@@ -1,11 +1,35 @@
 import React, { useState } from 'react';
+import { useRouter } from 'next/router';
 import { formatCurrency, getStatusBadgeClass } from '../../utils/formatters';
 import { IconFolder, IconSearch, IconMapPin, IconFlag } from '../common/Icons';
 
-const ProjectsTable = ({ projects = [] }) => {
+import { projectsAPI } from '../../utils/api';
+
+const ProjectsTable = ({ projects = [], onRefresh }) => {
+    const router = useRouter();
     const [search, setSearch] = useState('');
     const [filterDept, setFilterDept] = useState('');
     const [filterStatus, setFilterStatus] = useState('');
+    const [processing, setProcessing] = useState(null);
+
+    const handleApprove = async (e, id, status) => {
+        e.stopPropagation();
+        if (!confirm(`Are you sure you want to ${status} this project?`)) return;
+
+        setProcessing(id);
+        try {
+            const res = await projectsAPI.approve(id, status);
+            if (res.success) {
+                if (onRefresh) onRefresh();
+            } else {
+                alert(res.message);
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Failed to update status');
+        }
+        setProcessing(null);
+    };
 
     const filtered = projects.filter((p) => {
         const locationStr = typeof p.location === 'object' ? (p.location.city || p.location.address || '') : (p.location || '');
@@ -52,52 +76,49 @@ const ProjectsTable = ({ projects = [] }) => {
                             <th className="py-3 ps-4" style={{ fontWeight: 600, color: '#6B7280' }}>Project Name</th>
                             <th className="py-3" style={{ fontWeight: 600, color: '#6B7280' }}>Location</th>
                             <th className="py-3" style={{ fontWeight: 600, color: '#6B7280' }}>Budget</th>
-                            <th className="py-3" style={{ fontWeight: 600, color: '#6B7280' }}>Spent</th>
-                            <th className="py-3" style={{ fontWeight: 600, color: '#6B7280' }}>Completion</th>
                             <th className="py-3" style={{ fontWeight: 600, color: '#6B7280' }}>Status</th>
-                            <th className="py-3" style={{ fontWeight: 600, color: '#6B7280' }}>Risk</th>
+                            <th className="py-3" style={{ fontWeight: 600, color: '#6B7280' }}>Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         {filtered.map((project) => {
                             const locationStr = typeof project.location === 'object' ? (project.location.city || project.location.address || '') : (project.location || '');
                             return (
-                                <tr key={project._id || project.id} style={{ cursor: 'pointer' }}>
+                                <tr key={project._id || project.id} style={{ cursor: 'pointer' }} onClick={() => router.push(`/projects/${project._id || project.id}`)}>
                                     <td className="py-3 ps-4">
                                         <div className="fw-semibold">{project.title}</div>
                                         <small className="text-muted">{project.department}</small>
+                                        {project.approvalStatus === 'Pending' && <span className="badge bg-warning text-dark ms-2" style={{ fontSize: 10 }}>Pending</span>}
                                     </td>
                                     <td className="py-3">
                                         <span className="d-flex align-items-center gap-1"><IconMapPin size={13} color="#6B7280" /> {locationStr}</span>
                                     </td>
                                     <td className="py-3">{formatCurrency(project.totalBudget)}</td>
                                     <td className="py-3">
-                                        <div>{formatCurrency(project.amountSpent)}</div>
-                                        <div className="progress mt-1" style={{ height: 4, width: 80 }}>
-                                            <div className="progress-bar" style={{ width: `${(project.amountSpent / project.totalBudget) * 100}%`, backgroundColor: (project.amountSpent / project.totalBudget) > 0.9 ? '#EF4444' : '#3B82F6' }} />
-                                        </div>
-                                    </td>
-                                    <td className="py-3">
-                                        <div className="d-flex align-items-center gap-2">
-                                            <div className="position-relative" style={{ width: 40, height: 40 }}>
-                                                <svg viewBox="0 0 36 36" style={{ width: 40, height: 40, transform: 'rotate(-90deg)' }}>
-                                                    <circle cx="18" cy="18" r="15" fill="none" stroke="#E5E7EB" strokeWidth="3" />
-                                                    <circle cx="18" cy="18" r="15" fill="none" stroke={project.completionPercentage >= 70 ? '#10B981' : project.completionPercentage >= 40 ? '#F59E0B' : '#EF4444'} strokeWidth="3" strokeDasharray={`${project.completionPercentage * 0.94} 100`} />
-                                                </svg>
-                                                <span className="position-absolute top-50 start-50 translate-middle" style={{ fontSize: 10, fontWeight: 600 }}>{project.completionPercentage}%</span>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="py-3">
                                         <span className={`badge ${getStatusBadgeClass(project.status)} rounded-pill`} style={{ fontSize: 11 }}>{project.status}</span>
                                     </td>
                                     <td className="py-3">
-                                        {project.riskFlag ? (
-                                            <span className="badge bg-danger rounded-pill d-flex align-items-center gap-1" style={{ fontSize: 11, width: 'fit-content' }}>
-                                                <IconFlag size={10} color="#fff" /> Flagged
-                                            </span>
+                                        {project.approvalStatus === 'Pending' ? (
+                                            <div className="d-flex gap-1">
+                                                <button
+                                                    className="btn btn-success btn-sm py-0 px-2"
+                                                    style={{ fontSize: 11 }}
+                                                    onClick={(e) => handleApprove(e, project._id || project.id, 'Approved')}
+                                                    disabled={processing === (project._id || project.id)}
+                                                >
+                                                    Approve
+                                                </button>
+                                                <button
+                                                    className="btn btn-danger btn-sm py-0 px-2"
+                                                    style={{ fontSize: 11 }}
+                                                    onClick={(e) => handleApprove(e, project._id || project.id, 'Rejected')}
+                                                    disabled={processing === (project._id || project.id)}
+                                                >
+                                                    Reject
+                                                </button>
+                                            </div>
                                         ) : (
-                                            <span className="text-success fw-bold">✓</span>
+                                            <small className="text-muted">{project.approvalStatus}</small>
                                         )}
                                     </td>
                                 </tr>

@@ -42,10 +42,12 @@ exports.validateCreateProject = [
   body('location.state').trim().notEmpty().withMessage('State is required'),
 
   body('location.coordinates.latitude')
+    .optional()
     .isFloat({ min: -90, max: 90 })
     .withMessage('Invalid latitude'),
 
   body('location.coordinates.longitude')
+    .optional()
     .isFloat({ min: -180, max: 180 })
     .withMessage('Invalid longitude'),
 
@@ -111,7 +113,7 @@ exports.validateUpdateProject = [
 
   body('status')
     .optional()
-    .isIn(['On Time', 'Delayed', 'Critical', 'Completed'])
+    .isIn(['Planned', 'Tender', 'In Progress', 'On Time', 'Delayed', 'Critical', 'Completed'])
     .withMessage('Invalid status'),
 
   (req, res, next) => {

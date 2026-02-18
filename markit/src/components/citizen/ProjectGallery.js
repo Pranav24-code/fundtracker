@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { formatCurrency } from '../../utils/formatters';
 import { IconSearch, IconMapPin, IconEye, IconBuilding, IconArrowRight } from '../common/Icons';
 
@@ -90,21 +91,24 @@ const ProjectGallery = ({ projects = [] }) => {
                                         </div>
                                     </div>
 
-                                    <button className="btn w-100 fw-medium d-flex align-items-center justify-content-center gap-2"
-                                        style={{
-                                            backgroundColor: 'transparent',
-                                            border: `1px solid ${theme.primary}`,
-                                            color: theme.primary,
-                                            borderRadius: 10,
-                                            padding: '10px',
-                                            fontSize: 13,
-                                            transition: 'all 0.2s'
-                                        }}
-                                        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = theme.primary; e.currentTarget.style.color = '#fff'; }}
-                                        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = theme.primary; }}
-                                    >
-                                        View Project Details <IconArrowRight size={14} />
-                                    </button>
+                                    <Link href={`/projects/${project._id || project.id}`}>
+                                        <a className="btn w-100 fw-medium d-flex align-items-center justify-content-center gap-2"
+                                            style={{
+                                                backgroundColor: 'transparent',
+                                                border: `1px solid ${theme.primary}`,
+                                                color: theme.primary,
+                                                borderRadius: 10,
+                                                padding: '10px',
+                                                fontSize: 13,
+                                                transition: 'all 0.2s',
+                                                textDecoration: 'none'
+                                            }}
+                                            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = theme.primary; e.currentTarget.style.color = '#fff'; }}
+                                            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = theme.primary; }}
+                                        >
+                                            View Project Details <IconArrowRight size={14} />
+                                        </a>
+                                    </Link>
                                 </div>
                             </div>
                         </div>

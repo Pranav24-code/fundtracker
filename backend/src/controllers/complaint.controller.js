@@ -51,7 +51,39 @@ exports.submitComplaint = async (req, res) => {
         latitude: latitude ? parseFloat(latitude) : undefined,
         longitude: longitude ? parseFloat(longitude) : undefined,
       },
+      ipAddress: req.ip || req.headers['x-forwarded-for'] || req.connection.remoteAddress,
     });
+
+    // Gamification & Blacklist Logic
+    try {
+      // 1. Update Citizen: Increment complaint count and check for points
+      const User = require('../models/User');
+      const citizen = await User.findById(req.user.id);
+      citizen.complaintCount = (citizen.complaintCount || 0) + 1;
+
+      // Award 50 points for every 15 complaints
+      if (citizen.complaintCount % 15 === 0) {
+        citizen.points = (citizen.points || 0) + 50;
+      }
+      await citizen.save();
+
+      // 2. Update Contractor: Increment complaint count and check for blacklist
+      if (project.contractor) {
+        const contractor = await User.findById(project.contractor);
+        if (contractor) {
+          contractor.complaintCount = (contractor.complaintCount || 0) + 1;
+
+          // Blacklist if 10 or more complaints
+          if (contractor.complaintCount >= 10) {
+            contractor.isBlacklisted = true;
+          }
+          await contractor.save();
+        }
+      }
+    } catch (gamificationError) {
+      console.error('Gamification error:', gamificationError);
+      // Don't fail the request if gamification fails
+    }
 
     await complaint.populate('project', 'title location');
     await complaint.populate('citizen', 'name email');
@@ -62,6 +94,7 @@ exports.submitComplaint = async (req, res) => {
       {
         complaint,
         trackingId: complaint.trackingId,
+        pointsAwarded: (req.user.complaintCount + 1) % 15 === 0 ? 50 : 0
       },
       201
     );
@@ -202,6 +235,7 @@ exports.upvoteComplaint = async (req, res) => {
 exports.respondToComplaint = async (req, res) => {
   try {
     const { message, status } = req.body;
+    console.log(`Responding to complaint ${req.params.id} by user ${req.user.id}`);
 
     const complaint = await Complaint.findById(req.params.id);
 
@@ -220,12 +254,13 @@ exports.respondToComplaint = async (req, res) => {
     }
 
     await complaint.save();
+    console.log('Complaint saved successfully');
 
     await complaint.populate('adminResponse.respondedBy', 'name email');
 
     return successResponse(res, 'Response added successfully', { complaint });
   } catch (error) {
     console.error('Respond error:', error);
-    return errorResponse(res, 'Failed to respond to complaint', 500);
+    return errorResponse(res, 'Failed to respond to complaint: ' + error.message, 500);
   }
 };

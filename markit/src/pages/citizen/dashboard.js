@@ -5,24 +5,38 @@ import Footer from '../../components/layout/Footer';
 import StatsCard from '../../components/common/StatsCard';
 import ProjectGallery from '../../components/citizen/ProjectGallery';
 import ComplaintForm from '../../components/citizen/ComplaintForm';
-import { projectsAPI } from '../../utils/api';
+import { projectsAPI, authAPI } from '../../utils/api';
+import { useAuth } from '../../context/AuthContext';
 import { formatCurrency } from '../../utils/formatters';
 import { IconBuilding, IconWallet, IconBarChart, IconMegaphone, IconSearch, IconArrowRight, IconUsers, IconCheckCircle } from '../../components/common/Icons';
 
 const CitizenDashboard = () => {
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [userPoints, setUserPoints] = useState(0);
+
+    const { user } = useAuth(); // Get user from context
 
     useEffect(() => {
         fetchProjects();
-    }, []);
+        if (user) {
+            // In a real app, we'd fetch fresh user stats here or rely on the context having them
+            // For now, let's assume the user object in context might have points or we fetch it
+            if (user.points) setUserPoints(user.points);
+        }
+    }, [user]);
 
     const fetchProjects = async () => {
         try {
             const res = await projectsAPI.getAll({ limit: 50 });
             if (res.success) setProjects(res.data.projects);
+
+            // Refresh user data (if we had a specific endpoint for stats)
+            const authRes = await authAPI.getMe();
+            if (authRes.success) setUserPoints(authRes.data.user.points || 0);
+
         } catch (err) {
-            console.error('Failed to fetch projects:', err);
+            console.error('Failed to fetch data:', err);
         }
         setLoading(false);
     };
@@ -100,7 +114,7 @@ const CitizenDashboard = () => {
                             <StatsCard icon={<IconBarChart size={24} />} label="Avg. Completion" value={`${avgCompletion}%`} subtext="Progress rate" color="purple" progress={avgCompletion} />
                         </div>
                         <div className="col-md-3">
-                            <StatsCard icon={<IconMegaphone size={24} />} label="Citizen Reports" value={projects.filter(p => p.riskFlag).length} subtext="Concerns raised" color="red" />
+                            <StatsCard icon={<IconUsers size={24} />} label="My Impact Points" value={userPoints} subtext="Earned for contributing" color="orange" />
                         </div>
                     </div>
                 </div>

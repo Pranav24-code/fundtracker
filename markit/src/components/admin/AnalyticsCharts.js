@@ -34,16 +34,36 @@ const AnalyticsCharts = ({ projects = [] }) => {
 
     const maxBudget = topProjects.length > 0 ? Math.max(...topProjects.map(p => p.budget)) : 1;
 
-    // Monthly trends (simulated from project creation dates)
-    const monthlyTrends = [
-        { month: 'Sep', allocated: 200, spent: 150 },
-        { month: 'Oct', allocated: 220, spent: 170 },
-        { month: 'Nov', allocated: 240, spent: 195 },
-        { month: 'Dec', allocated: 260, spent: 210 },
-        { month: 'Jan', allocated: 280, spent: 230 },
-        { month: 'Feb', allocated: 300, spent: 245 },
-    ];
-    const maxTrend = Math.max(...monthlyTrends.map(t => Math.max(t.allocated, t.spent)));
+    // Monthly trends (calculated from real data)
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const currentMonth = new Date().getMonth();
+    // Show last 6 months
+    const trendMonths = [];
+    for (let i = 5; i >= 0; i--) {
+        const d = new Date();
+        d.setMonth(currentMonth - i);
+        trendMonths.push({
+            month: months[d.getMonth()],
+            year: d.getFullYear(),
+            allocated: 0,
+            spent: 0
+        });
+    }
+
+    projects.forEach(p => {
+        const date = new Date(p.createdAt || p.startDate);
+        const month = months[date.getMonth()];
+        const year = date.getFullYear();
+
+        const trend = trendMonths.find(t => t.month === month && t.year === year);
+        if (trend) {
+            trend.allocated += p.totalBudget || 0;
+            trend.spent += p.amountSpent || 0;
+        }
+    });
+
+    const monthlyTrends = trendMonths; // No fallback
+    const maxTrend = Math.max(...monthlyTrends.map(t => Math.max(t.allocated, t.spent))) || 1;
 
     return (
         <div className="row g-4">

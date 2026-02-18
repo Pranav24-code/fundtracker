@@ -49,7 +49,7 @@ const complaintSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['Pending', 'Under Review', 'Resolved', 'Closed'],
+      enum: ['Pending', 'Under Review', 'Resolved', 'Closed', 'Rejected'],
       default: 'Pending',
     },
     upvotes: {
@@ -77,6 +77,10 @@ const complaintSchema = new mongoose.Schema(
     isCritical: {
       type: Boolean,
       default: false,
+    },
+    ipAddress: {
+      type: String,
+      select: false, // Don't return by default for privacy
     },
   },
   {

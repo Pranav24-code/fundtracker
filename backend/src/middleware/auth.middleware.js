@@ -6,8 +6,10 @@ exports.protect = async (req, res, next) => {
   try {
     let token;
 
-    // Get token from header
-    if (
+    // Get token from cookie first, then header
+    if (req.cookies && req.cookies.token) {
+      token = req.cookies.token;
+    } else if (
       req.headers.authorization &&
       req.headers.authorization.startsWith('Bearer')
     ) {
@@ -55,4 +57,35 @@ exports.authorize = (...roles) => {
     }
     next();
   };
+};
+
+// Optional protection - attach user if token exists, otherwise proceed as guest
+exports.optionalProtect = async (req, res, next) => {
+  try {
+    let token;
+
+    if (req.cookies && req.cookies.token) {
+      token = req.cookies.token;
+    } else if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith('Bearer')
+    ) {
+      token = req.headers.authorization.split(' ')[1];
+    }
+
+    if (!token) {
+      return next();
+    }
+
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = await User.findById(decoded.id);
+      next();
+    } catch (error) {
+      // Invalid token, proceed as guest
+      next();
+    }
+  } catch (error) {
+    next();
+  }
 };

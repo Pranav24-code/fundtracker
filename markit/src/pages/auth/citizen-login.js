@@ -7,9 +7,11 @@ import { IconUser, IconMail, IconLock, IconHeart, IconEye, IconArrowRight } from
 
 const CitizenLogin = () => {
     const router = useRouter();
-    const { login } = useAuth();
-    const [email, setEmail] = useState('citizen1@petms.gov.in');
-    const [password, setPassword] = useState('Citizen@123');
+    const { login, register } = useAuth();
+    const [isLogin, setIsLogin] = useState(true);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [name, setName] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
@@ -18,21 +20,40 @@ const CitizenLogin = () => {
         setError('');
         setLoading(true);
         try {
-            const result = await login(email, password, 'citizen');
+            let result;
+            if (isLogin) {
+                result = await login(email, password, 'citizen');
+            } else {
+                result = await register({
+                    name,
+                    email,
+                    password,
+                    role: 'citizen'
+                });
+            }
+
             if (result.success) {
                 router.push('/citizen/dashboard');
             } else {
-                setError(result.message || 'Invalid credentials');
+                setError(result.message || 'Authentication failed');
             }
         } catch (err) {
-            setError('Login failed. Is the backend server running?');
+            setError('Connection failed. Is the backend server running?');
         }
         setLoading(false);
     };
 
+    const toggleMode = () => {
+        setIsLogin(!isLogin);
+        setError('');
+        setEmail('');
+        setPassword('');
+        setName('');
+    };
+
     return (
         <>
-            <SEO pageTitle="Citizen Login - PETMS" />
+            <SEO pageTitle={`Citizen ${isLogin ? 'Login' : 'Sign Up'} - PETMS`} />
             <div className="d-flex min-vh-100 bg-white">
                 {/* Left Side - Visual & Branding */}
                 <div className="d-none d-lg-flex col-lg-6 position-relative align-items-center justify-content-center text-white"
@@ -75,12 +96,12 @@ const CitizenLogin = () => {
                     </div>
                 </div>
 
-                {/* Right Side - Login Form */}
+                {/* Right Side - Form */}
                 <div className="col-12 col-lg-6 d-flex align-items-center justify-content-center bg-white">
                     <div className="w-100 p-5" style={{ maxWidth: 500 }}>
                         <div className="text-center mb-5">
                             <h2 className="fw-bold text-dark">Citizen Portal</h2>
-                            <p className="text-muted">Welcome back, Neighbor!</p>
+                            <p className="text-muted">{isLogin ? 'Welcome back, Neighbor!' : 'Join the Community'}</p>
                         </div>
 
                         {error && (
@@ -90,6 +111,24 @@ const CitizenLogin = () => {
                         )}
 
                         <form onSubmit={handleSubmit}>
+                            {!isLogin && (
+                                <div className="mb-4">
+                                    <label className="form-label fw-semibold text-secondary small text-uppercase">Full Name</label>
+                                    <div className="input-group">
+                                        <span className="input-group-text bg-light border-end-0 text-muted"><IconUser size={18} /></span>
+                                        <input
+                                            type="text"
+                                            className="form-control bg-light border-start-0 py-3"
+                                            placeholder="Your Name"
+                                            value={name}
+                                            onChange={(e) => setName(e.target.value)}
+                                            required={!isLogin}
+                                            style={{ boxShadow: 'none' }}
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
                             <div className="mb-4">
                                 <label className="form-label fw-semibold text-secondary small text-uppercase">Email Address</label>
                                 <div className="input-group">
@@ -122,31 +161,29 @@ const CitizenLogin = () => {
                                 </div>
                             </div>
 
-                            <div className="d-flex justify-content-between align-items-center mb-4">
-                                <div className="form-check">
-                                    <input className="form-check-input" type="checkbox" id="rememberMe" />
-                                    <label className="form-check-label text-muted small" htmlFor="rememberMe">Remember me</label>
+                            {isLogin && (
+                                <div className="d-flex justify-content-between align-items-center mb-4">
+                                    <div className="form-check">
+                                        <input className="form-check-input" type="checkbox" id="rememberMe" />
+                                        <label className="form-check-label text-muted small" htmlFor="rememberMe">Remember me</label>
+                                    </div>
+                                    <a href="#" className="text-success small text-decoration-none fw-semibold">Forgot Password?</a>
                                 </div>
-                                <a href="#" className="text-success small text-decoration-none fw-semibold">Forgot Password?</a>
-                            </div>
+                            )}
 
                             <button type="submit" className="btn btn-success w-100 py-3 rounded-3 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2"
                                 disabled={loading}
                                 style={{ background: '#059669', borderColor: '#059669' }}>
-                                {loading ? 'Logging in...' : <>Sign In <IconArrowRight size={18} /></>}
+                                {loading ? 'Processing...' : <>{isLogin ? 'Sign In' : 'Create Account'} <IconArrowRight size={18} /></>}
                             </button>
                         </form>
 
                         <div className="mt-5 pt-4 text-center border-top">
-                            <div className="p-3 rounded-3 bg-light text-start mb-3">
-                                <small className="d-block text-uppercase fw-bold text-muted mb-1" style={{ fontSize: 10 }}>Demo Credentials</small>
-                                <div className="d-flex justify-content-between align-items-center small">
-                                    <span className="text-dark fw-medium">citizen1@petms.gov.in</span>
-                                    <span className="font-monospace text-secondary">Citizen@123</span>
-                                </div>
-                            </div>
                             <p className="text-muted small mb-0">
-                                New to PETMS? <Link href="/"><a className="text-success fw-semibold text-decoration-none">Create an Account</a></Link>
+                                {isLogin ? 'New to PETMS?' : 'Already have an account?'}
+                                <button onClick={toggleMode} className="btn btn-link text-success fw-semibold text-decoration-none p-0 ms-1">
+                                    {isLogin ? 'Create an Account' : 'Sign In'}
+                                </button>
                             </p>
                             <div className="mt-3">
                                 <Link href="/"><a className="text-muted small text-decoration-none">← Back to Home</a></Link>

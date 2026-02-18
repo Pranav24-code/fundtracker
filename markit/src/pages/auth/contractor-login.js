@@ -3,13 +3,16 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import SEO from '../../components/seo';
 import { useAuth } from '../../context/AuthContext';
-import { IconHardHat, IconMail, IconLock, IconArrowRight, IconBuilding, IconMapPin } from '../../components/common/Icons';
+import { IconHardHat, IconMail, IconLock, IconArrowRight, IconBuilding, IconMapPin, IconUser } from '../../components/common/Icons';
 
 const ContractorLogin = () => {
     const router = useRouter();
-    const { login } = useAuth();
-    const [email, setEmail] = useState('contractor1@petms.gov.in');
-    const [password, setPassword] = useState('Contractor@123');
+    const { login, register } = useAuth();
+    const [isLogin, setIsLogin] = useState(true);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [name, setName] = useState('');
+    const [companyName, setCompanyName] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
@@ -18,21 +21,42 @@ const ContractorLogin = () => {
         setError('');
         setLoading(true);
         try {
-            const result = await login(email, password, 'contractor');
+            let result;
+            if (isLogin) {
+                result = await login(email, password, 'contractor');
+            } else {
+                result = await register({
+                    name,
+                    email,
+                    password,
+                    role: 'contractor',
+                    organization: companyName
+                });
+            }
+
             if (result.success) {
                 router.push('/contractor/dashboard');
             } else {
-                setError(result.message || 'Invalid credentials');
+                setError(result.message || 'Authentication failed');
             }
         } catch (err) {
-            setError('Login failed. Is the backend server running?');
+            setError('Connection failed. Is the backend server running?');
         }
         setLoading(false);
     };
 
+    const toggleMode = () => {
+        setIsLogin(!isLogin);
+        setError('');
+        setEmail('');
+        setPassword('');
+        setName('');
+        setCompanyName('');
+    };
+
     return (
         <>
-            <SEO pageTitle="Contractor Login - PETMS" />
+            <SEO pageTitle={`Contractor ${isLogin ? 'Login' : 'Sign Up'} - PETMS`} />
             <div className="container-fluid min-vh-100 d-flex p-0">
                 {/* Left Side - Visual */}
                 <div className="col-lg-8 d-none d-lg-flex position-relative align-items-center justify-content-center overflow-hidden"
@@ -77,7 +101,7 @@ const ContractorLogin = () => {
                     </div>
                 </div>
 
-                {/* Right Side - Login Form */}
+                {/* Right Side - Form */}
                 <div className="col-lg-4 col-12 bg-white d-flex align-items-center justify-content-center position-relative">
                     <div className="w-100 p-5" style={{ maxWidth: 500 }}>
                         <div className="text-center mb-5">
@@ -85,7 +109,7 @@ const ContractorLogin = () => {
                                 <IconBuilding size={40} color="#EF4444" />
                             </div>
                             <h2 className="fw-bold mb-1" style={{ color: '#991B1B' }}>Contractor Portal</h2>
-                            <p className="text-muted">Partnering for Progress</p>
+                            <p className="text-muted">{isLogin ? 'Partnering for Progress' : 'Join the Network'}</p>
                         </div>
 
                         {error && (
@@ -95,6 +119,41 @@ const ContractorLogin = () => {
                         )}
 
                         <form onSubmit={handleSubmit}>
+                            {!isLogin && (
+                                <>
+                                    <div className="mb-4">
+                                        <label className="form-label fw-bold text-secondary small text-uppercase" style={{ fontSize: 11, letterSpacing: '1px' }}>Full Name</label>
+                                        <div className="input-group">
+                                            <span className="input-group-text bg-light border-end-0 text-muted ps-3 border"><IconUser size={18} /></span>
+                                            <input
+                                                type="text"
+                                                className="form-control bg-light border-start-0 py-3 ps-2 border"
+                                                placeholder="Proprietor Name"
+                                                value={name}
+                                                onChange={(e) => setName(e.target.value)}
+                                                required={!isLogin}
+                                                style={{ boxShadow: 'none' }}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="mb-4">
+                                        <label className="form-label fw-bold text-secondary small text-uppercase" style={{ fontSize: 11, letterSpacing: '1px' }}>Company Name</label>
+                                        <div className="input-group">
+                                            <span className="input-group-text bg-light border-end-0 text-muted ps-3 border"><IconBuilding size={18} /></span>
+                                            <input
+                                                type="text"
+                                                className="form-control bg-light border-start-0 py-3 ps-2 border"
+                                                placeholder="Construction Co. Pvt Ltd"
+                                                value={companyName}
+                                                onChange={(e) => setCompanyName(e.target.value)}
+                                                required={!isLogin}
+                                                style={{ boxShadow: 'none' }}
+                                            />
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+
                             <div className="mb-4">
                                 <label className="form-label fw-bold text-secondary small text-uppercase" style={{ fontSize: 11, letterSpacing: '1px' }}>Email Address</label>
                                 <div className="input-group">
@@ -127,30 +186,29 @@ const ContractorLogin = () => {
                                 </div>
                             </div>
 
-                            <div className="d-flex justify-content-between align-items-center mb-4">
-                                <div className="form-check">
-                                    <input className="form-check-input" type="checkbox" id="rememberMe" style={{ borderColor: '#D1D5DB' }} />
-                                    <label className="form-check-label text-muted small" htmlFor="rememberMe">Remember me</label>
+                            {isLogin && (
+                                <div className="d-flex justify-content-between align-items-center mb-4">
+                                    <div className="form-check">
+                                        <input className="form-check-input" type="checkbox" id="rememberMe" style={{ borderColor: '#D1D5DB' }} />
+                                        <label className="form-check-label text-muted small" htmlFor="rememberMe">Remember me</label>
+                                    </div>
+                                    <a href="#" className="text-danger small text-decoration-none fw-semibold">Forgot Password?</a>
                                 </div>
-                                <a href="#" className="text-danger small text-decoration-none fw-semibold">Forgot Password?</a>
-                            </div>
+                            )}
 
                             <button type="submit" className="btn btn-danger w-100 py-3 rounded-pill fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2 transform-scale-hover"
                                 disabled={loading}
                                 style={{ background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)', border: 'none', transition: 'transform 0.2s' }}>
-                                {loading ? 'Authenticating...' : <>Sign In <IconArrowRight size={18} /></>}
+                                {loading ? 'Processing...' : <>{isLogin ? 'Sign In' : 'Create Account'} <IconArrowRight size={18} /></>}
                             </button>
                         </form>
 
                         <div className="mt-5 text-center">
-                            <div className="p-3 rounded-3 bg-light text-center mb-4 border border-light">
-                                <small className="text-muted d-block uppercase tracking-wider mb-1" style={{ fontSize: 10 }}>Allowed Credentials</small>
-                                <span className="d-block fw-bold text-dark small">contractor1@petms.gov.in</span>
-                                <span className="d-block font-monospace text-secondary" style={{ fontSize: 11 }}>Contractor@123</span>
-                            </div>
-
                             <p className="text-muted small mb-0">
-                                Not registered yet? <Link href="/"><a className="text-danger fw-bold text-decoration-none">Contact Support</a></Link>
+                                {isLogin ? 'Not registered yet?' : 'Already have an account?'}
+                                <button onClick={toggleMode} className="btn btn-link text-danger fw-bold text-decoration-none p-0 ms-1">
+                                    {isLogin ? 'Apply for Partnership' : 'Sign In'}
+                                </button>
                             </p>
                             <div className="mt-3">
                                 <Link href="/"><a className="text-secondary small text-decoration-none hover-opacity">← Back to Home</a></Link>

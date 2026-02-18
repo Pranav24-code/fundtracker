@@ -60,6 +60,12 @@ export const projectsAPI = {
     update: (id, data) => api.put(`/projects/${id}`, data),
     delete: (id) => api.delete(`/projects/${id}`),
     getNearby: (lat, lng, radius) => api.get('/projects/nearby', { params: { latitude: lat, longitude: lng, radius } }),
+    getUpdates: (id) => api.get(`/projects/${id}/updates`),
+    claim: (id) => api.post(`/projects/${id}/claim`),
+    submitUpdate: (id, data) => api.post(`/projects/${id}/update`, data, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+    approve: (id, status) => api.put(`/projects/${id}/approve`, { status }),
 };
 
 // Complaints API
